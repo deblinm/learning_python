@@ -14,8 +14,8 @@ def run_validation (df, config_data):
 
 def generate_summary(results):
     total_failure = len([r for r in results if r["status"] == "fail"])
-    critical_failures = len([r for r in results if r["status"] == "fail" and r["severity"] == "critical"])
-    warning_failures = len([r for r in results if r["status"] == "fail" and r["severity"] == "warning"])
+    critical_failures = len([r for r in results if r["status"] == "fail" and r["severity"] == "high"])
+    warning_failures = len([r for r in results if r["status"] == "fail" and r["severity"] == "medium"])
 
     return {
         "total_checks_executed": len(results),

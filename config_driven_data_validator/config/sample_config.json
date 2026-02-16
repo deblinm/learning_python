@@ -1,5 +1,5 @@
 {
-    "env": "PROD",
+    "env": "prod",
     "allowed_countries": [
         "US",
         "CA",

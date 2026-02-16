@@ -3,7 +3,7 @@ import  pandas as pd
 def run_rules(df , config):
     results = []
     for rule_name , rule_config in config["rules"].items():
-        rule_type = rule_config["type"].strip()
+        rule_type = rule_config["type"]
         column = rule_config["column"]
         severity = rule_config["severity"]
 
@@ -22,7 +22,6 @@ def run_rules(df , config):
         if rule_type == "age_range":
             min_age = rule_config["min"]
             max_age = rule_config["max"]
-            df[column] = pd.to_numeric(df[column], errors='coerce')
             invalid_rows =  ((df[column].isnull()) |
                              (df[column] > max_age) |
                              (df[column] < min_age))
