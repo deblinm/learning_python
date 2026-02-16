@@ -1,23 +1,14 @@
-from .validation_rules import (check_required_columns,
-                              check_age_range,
-                              check_salary_range,
-                              check_country_allowed
-                              )
+from .validation_rules import run_rules
 
 import pandas as pd
 
 def run_validation (df, config_data):
-    all_results = []
+    results = run_rules(df, config_data)
 
-    all_results.extend(check_required_columns(df, config_data))
-    all_results.extend(check_age_range(df, config_data))
-    all_results.extend(check_salary_range(df, config_data))
-    all_results.extend(check_country_allowed(df, config_data))
-
-    summary = generate_summary(all_results)
+    summary = generate_summary(results)
 
     return {
-        "results": all_results,
+        "results": results,
         "summary": summary
     }
 

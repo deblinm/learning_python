@@ -1,11 +1,29 @@
 {
-    "env": "prod",
-    "required_columns": ["customer_id", "age", "salary", "country","street_address","state"],
-    "allowed_countries": ["US", "CA"],
+    "env": "PROD",
+    "allowed_countries": [
+        "US",
+        "CA",
+        "MXC"
+    ],
     "rules": {
-        "req_cols": {"severity": "critical"},
-        "age": {"min": 18, "max": 60, "severity": "critical"},
-        "salary": {"min": 0, "severity": "critical"},
-        "country": {"severity": "warning"}
+        "age": {
+            "type": "age_range",
+            "column": "age",
+            "min": 18,
+            "max": 60,
+            "severity": "high"
+        },
+        "salary": {
+            "type": "min_sal",
+            "column": "salary",
+            "min": 0,
+            "severity": "medium"
+    },
+        "country": {
+            "type": "allowed_country",
+            "column": "country",
+            "allowed_key": "allowed_countries",
+            "severity": "low"
+        }
     }
 }

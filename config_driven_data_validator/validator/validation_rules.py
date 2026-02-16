@@ -1,110 +1,60 @@
 import  pandas as pd
 
-def check_required_columns(df,config_data):
+def run_rules(df , config):
     results = []
-    severity = config_data["rules"]["req_cols"]["severity"]
-    required_columns = config_data.get('required_columns')
-    for cols in required_columns:
-        if cols not in df.columns:
-            results.append({"rule": "required_columns",
+    for rule_name , rule_config in config["rules"].items():
+        rule_type = rule_config["type"].strip()
+        column = rule_config["column"]
+        severity = rule_config["severity"]
+
+
+        # Missing column check
+        if column not in df.columns:
+            results.append({
+                "rule": rule_type,
+                "status": "fail",
+                "message": f"Column '{column}' is missing",
+                "severity": severity
+            })
+            continue
+
+        # ---------- AGE RULE ----------
+        if rule_type == "age_range":
+            min_age = rule_config["min"]
+            max_age = rule_config["max"]
+            df[column] = pd.to_numeric(df[column], errors='coerce')
+            invalid_rows =  ((df[column].isnull()) |
+                             (df[column] > max_age) |
+                             (df[column] < min_age))
+
+
+        # ---------- SALARY RULE ----------
+        elif  rule_type == "min_sal":
+            min_sal = rule_config["min"]
+            invalid_rows = (df[column].isnull() |
+                            (df[column] < min_sal))
+
+        # ---------- COUNTRY RULE ----------
+        elif rule_type == "allowed_country":
+            allowed_key = rule_config.get("allowed_key")
+            allowed_values = config.get(allowed_key, [])
+
+            invalid_rows = (df[column].isnull() |
+                            ~ df[column].isin(allowed_values) )
+
+        else:
+            continue
+
+        invalid_rec = df[invalid_rows]
+
+        for index, val in zip (invalid_rec.index, invalid_rec[column]):
+            results.append(
+                {
+                    "rule": rule_name,
                     "status": "fail",
-                    "message": f"Missing '{cols}'",
-                    "severity": f"{severity}"})
-    return results
-
-def check_age_range(df,config_data):
-    results = []
-
-    rule_config = config_data["rules"]["age"]
-    min_age = rule_config["min"]
-    max_age = rule_config["max"]
-    severity = rule_config["severity"]
-
-    if "age" not in df.columns:
-        return [{
-            "rule": "age_range",
-            "status": "fail",
-            "message": "Column 'age' is missing",
-            "severity": severity
-        }]
-
-    age_calc = df [(df["age"] > max_age) |
-                   (df["age"] < min_age) |
-                   (df["age"].isnull())]
-    results = [{
-        "rule": "age_range",
-                    "status": "fail",
-                    "message": f"Row {idx}, invalid age '{inval_age}'",
-                    "severity": f"{severity}"}
-        for idx,cust_id, inval_age in zip(age_calc.index,
-                                          age_calc.get("cust_id", ["N/A"] * len(age_calc)),
-                                          age_calc["age"])
-    ]
+                    "message": f"Row {index}, invalid value '{val}' in column '{column}'",
+                    "severity": severity
+                }
+            )
 
     return results
-
-def check_salary_range(df,config_data):
-    results = []
-
-    rule_config = config_data["rules"]["salary"]
-    min_sal = rule_config["min"]
-    severity = rule_config["severity"]
-
-    if "salary" not in df.columns:
-        return [{
-            "rule": "salary_range",
-            "status": "fail",
-            "message": "Column 'salary' is missing",
-            "severity": severity
-        }]
-
-    invalid_sal =df [(df["salary"].isnull()) | ( df["salary"] < min_sal)]
-
-    results = [{
-        "rule": "salary_range",
-        "status": "fail",
-        "message": f"Row {idx}, customer_id '{cust_id}' invalid salary '{salary}'",
-        "severity": f"{severity}"}
-        for idx, cust_id, salary in zip(invalid_sal.index,
-                                        invalid_sal.get("cust_id", ["N/A"] * len(invalid_sal)),
-                                        invalid_sal["salary"])
-    ]
-    return results
-
-
-def check_country_allowed(df,config_data):
-    rule_config = config_data["rules"]["country"]
-    severity = rule_config["severity"]
-    allowed_countries = config_data.get('allowed_countries', [])
-
-    if "country" not in df.columns:
-        return [{
-            "rule": "country_allowed",
-            "status": "fail",
-            "message": "Column 'country' is missing",
-            "severity": severity
-        }]
-
-    if not allowed_countries:
-        return [{
-            "rule": "country_allowed",
-            "status": "fail",
-            "message": "Allowed countries list is missing in config",
-            "severity": severity
-        }]
-
-    invalid_countries = df[(~df["country"].isin(allowed_countries))
-                           | (df["country"].isnull())]
-
-    results = [{
-        "rule": "country_allowed",
-        "status": "fail",
-        "message": f"Row {idx}, customer_id '{cust_id}' has invalid country '{ctry}'",
-        "severity": f"{severity}"}
-        for idx, cust_id, ctry in zip(invalid_countries.index,
-                                        invalid_countries.get("cust_id", ["N/A"] * len(invalid_countries)),
-                                        invalid_countries["country"])
-    ]
-    return results
-
-
