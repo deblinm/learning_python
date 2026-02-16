@@ -1,6 +1,6 @@
 import json
 import pandas as pd
-import validator.engine as e
+from validator.validation_rules import QualityChecker
 
 def load_data():
     data = {
@@ -22,17 +22,15 @@ def load_config(path):
 def main():
     config_data = load_config("config/sample_config.json")
     df = load_data()
-    output = e.run_validation(df, config_data)
+    checker = QualityChecker(df, config_data)
+    results = checker.run_rules()
 
-    print("Summary:")
-    print(output["summary"])
-
-    print("\nDetailed Results:")
-    for r in output["results"]:
-        print(r)
-
-    # Production enforcement
-    e.enforced_pipeline(output["summary"], config_data)
+    if results:
+        print("Validation Failures:")
+        for r in results:
+            print(r)
+    else:
+        print("All checks passed!")
 
 
 if __name__ == "__main__":

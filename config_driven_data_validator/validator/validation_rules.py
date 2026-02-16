@@ -1,59 +1,89 @@
 import  pandas as pd
 
-def run_rules(df , config):
-    results = []
-    for rule_name , rule_config in config["rules"].items():
-        rule_type = rule_config["type"]
+class QualityChecker:
+    def __init__(self,df,config):
+        self.df = df.copy()
+        self.config = config
+        self.result=[]
+
+    def run_rules(self):
+        rules = self.config.get("rules", {})
+
+        for rule_name , rule_config in rules.items():
+            rule_type = rule_config.get("type")
+
+            if rule_type == "range":
+                self.check_range(rule_name,rule_config)
+            elif rule_type == "min":
+                self.check_min(rule_name, rule_config)
+            elif rule_type == "allowed_list":
+                self.check_allowed_list(rule_name, rule_config)
+        return self.result
+
+
+
+    def check_range(self,rule_name,rule_config):
         column = rule_config["column"]
         severity = rule_config["severity"]
+        min_val = rule_config["min"]
+        max_val = rule_config["max"]
+        self.df[column] = pd.to_numeric(self.df[column], errors="coerce")
 
+        invalid_rows = self.df[((self.df[column].isnull()) |
+                        (self.df[column] < min_val) |
+                        (self.df[column] > max_val))]
 
-        # Missing column check
-        if column not in df.columns:
-            results.append({
-                "rule": rule_type,
+        for idx, val in zip(invalid_rows.index, invalid_rows[column]):
+            self.result.append({
+                "rule": rule_name,
+                "column": column,
+                "row": idx,
+                "value": val,
                 "status": "fail",
-                "message": f"Column '{column}' is missing",
-                "severity": severity
+                "severity": severity,
+                "message": f"{column} value '{val}' is outside range {min_val}-{max_val}"
             })
-            continue
-
-        # ---------- AGE RULE ----------
-        if rule_type == "age_range":
-            min_age = rule_config["min"]
-            max_age = rule_config["max"]
-            invalid_rows =  ((df[column].isnull()) |
-                             (df[column] > max_age) |
-                             (df[column] < min_age))
 
 
-        # ---------- SALARY RULE ----------
-        elif  rule_type == "min_sal":
-            min_sal = rule_config["min"]
-            invalid_rows = (df[column].isnull() |
-                            (df[column] < min_sal))
+    def check_min(self, rule_name, rule_config):
+        column = rule_config["column"]
+        severity = rule_config["severity"]
+        min_val = rule_config["min"]
+        invalid_rows = self.df[(self.df[column].isnull() |
+                        (self.df[column] < min_val))]
 
-        # ---------- COUNTRY RULE ----------
-        elif rule_type == "allowed_country":
-            allowed_key = rule_config.get("allowed_key")
-            allowed_values = config.get(allowed_key, [])
+        for idx, val in zip(invalid_rows.index, invalid_rows[column]):
+            self.result.append({
+                "rule": rule_name,
+                "column": column,
+                "row": idx,
+                "value": val,
+                "status": "fail",
+                "severity": severity,
+                "message": f"{column} value '{val}' is below min value allowed {min_val}"
+            })
 
-            invalid_rows = (df[column].isnull() |
-                            ~ df[column].isin(allowed_values) )
 
-        else:
-            continue
 
-        invalid_rec = df[invalid_rows]
+    def check_allowed_list(self,rule_name, rule_config):
+        column = rule_config["column"]
+        severity = rule_config["severity"]
+        allowed_key = rule_config.get("allowed_key")
+        allowed_values = self.config.get(allowed_key, [])
 
-        for index, val in zip (invalid_rec.index, invalid_rec[column]):
-            results.append(
-                {
-                    "rule": rule_name,
-                    "status": "fail",
-                    "message": f"Row {index}, invalid value '{val}' in column '{column}'",
-                    "severity": severity
-                }
-            )
+        invalid_rows = self.df[(self.df[column].isnull() |
+                        ~ self.df[column].isin(allowed_values))]
 
-    return results
+        for idx, val in zip(invalid_rows.index, invalid_rows[column]):
+            self.result.append({
+                "rule": rule_name,
+                "column": column,
+                "row": idx,
+                "value": val,
+                "status": "fail",
+                "severity": severity,
+                "message": f"{column} value '{val}' is not in allowed values  {allowed_values}"
+            })
+
+
+

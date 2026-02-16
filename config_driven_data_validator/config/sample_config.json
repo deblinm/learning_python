@@ -7,20 +7,20 @@
     ],
     "rules": {
         "age": {
-            "type": "age_range",
+            "type": "range",
             "column": "age",
             "min": 18,
             "max": 60,
             "severity": "high"
         },
         "salary": {
-            "type": "min_sal",
+            "type": "min",
             "column": "salary",
             "min": 0,
             "severity": "medium"
     },
         "country": {
-            "type": "allowed_country",
+            "type": "allowed_list",
             "column": "country",
             "allowed_key": "allowed_countries",
             "severity": "low"
