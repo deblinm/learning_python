@@ -25,13 +25,11 @@ def main():
     checker = QualityChecker(df, config_data)
     results = checker.run_rules()
 
-    if results:
-        print("Validation Failures:")
-        for r in results:
-            print(r)
+    print("Summary:", results["summary"])
+    if results["summary"]["high_severity_failures"] > 0:
+        print("Pipeline FAILED due to high severity issues.")
     else:
-        print("All checks passed!")
-
+        print("Pipeline PASSED.")
 
 if __name__ == "__main__":
     main()

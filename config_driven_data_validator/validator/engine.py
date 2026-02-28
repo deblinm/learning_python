@@ -1,6 +1,10 @@
-from .validation_rules import run_rules
-
 import pandas as pd
+
+class DataQualityEngine:
+    def __init__(self, df, config):
+        self.df = df.copy()
+        self.config = config
+        self.results = []
 
 def run_validation (df, config_data):
     results = run_rules(df, config_data)

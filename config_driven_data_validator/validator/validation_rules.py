@@ -18,7 +18,18 @@ class QualityChecker:
                 self.check_min(rule_name, rule_config)
             elif rule_type == "allowed_list":
                 self.check_allowed_list(rule_name, rule_config)
-        return self.result
+
+        summary = {
+            "total_rows": len(self.df),
+            "total_failures": len(self.result),
+            "high_severity_failures": len(
+                [r for r in self.result if r["severity"] == "high"]
+            )
+        }
+        return {
+            "summary": summary,
+            "failures": self.result
+        }
 
 
 
