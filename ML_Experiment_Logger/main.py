@@ -46,6 +46,8 @@ def main():
     EL_OBJ.filter_by_model("Test Model3")
     EL_OBJ.compare_experiment_outputs("EXP 2","EXP 3")
     EL_OBJ.view_best_model("accuracy")
+    EL_OBJ.save_to_file()
+    EL_OBJ.load_from_file()
 
 
 

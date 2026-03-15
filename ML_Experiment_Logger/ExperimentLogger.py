@@ -1,6 +1,8 @@
-from dataclasses import dataclass,field
+from dataclasses import dataclass, field, asdict
 from experiment import Experiment
 from typing import List
+import json
+import csv
 
 
 @dataclass
@@ -70,8 +72,26 @@ class ExperimentLogger:
             print(f"{in_metric} score: {best_experiment.model_metrics[in_metric]}")
             print(best_experiment)
 
-    def save_to_csv(self):
-        pass
+    def save_to_file(self):
+        path = "C:\\Users\\debli\\python_practice\\TargetData\\"
+        file_name = "ML_Experiment_Logger"
+        experiment_dict = [asdict(exp) for exp in self.experiments]
+        with open (f"{path}{file_name}.json",'w') as f:
+                json.dump(experiment_dict,f,indent=4, default=str)
 
-    def load_from_csv(self):
-        pass
+
+    def load_from_file(self):
+        path = "C:\\Users\\debli\\python_practice\\TargetData\\"
+        file_name = "ML_Experiment_Logger"
+        data_list = []
+        with open(f"{path}{file_name}.json", 'r') as ip_file:
+            reader = json.load(ip_file)
+            for row in reader:
+                data_obj = Experiment(**row)
+
+                data_list.append(data_obj)
+            self.experiments = data_list
+
+            print(f"Reading Data from your saved file")
+            for items in data_list:
+                    print(items)
