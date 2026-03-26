@@ -2,8 +2,6 @@ from dataclasses import dataclass, field, asdict
 from experiment import Experiment
 from typing import List
 import json
-import csv
-
 
 @dataclass
 class ExperimentLogger:
@@ -80,10 +78,5 @@ class ExperimentLogger:
             reader = json.load(ip_file)
             for row in reader:
                 data_obj = Experiment(**row)
-
                 data_list.append(data_obj)
-            self.experiments = data_list
-
-            print(f"Reading Data from your saved file")
-            for items in data_list:
-                    print(items)
+        return data_list
