@@ -25,42 +25,15 @@ class ExperimentLogger:
             for models in model_list:
                 print(models)
 
-
-
-    def compare_experiment_outputs(self,user_inp1,user_inp2):
-        match1 = next ((exp_nm for exp_nm in self.experiments if exp_nm.id == user_inp1),None)
-        match2 = next((exp_nm for exp_nm in self.experiments if exp_nm.id == user_inp2), None)
-
-        if not match1:
-            print(
-                f"There is no match found with experiment name {user_inp1}. Please input the exact name and retry. Thank You")
-        elif not match2:
-            print(
-                f"There is no match found with experiment name {user_inp2}. Please input the exact name and retry. Thank You")
-        else:
-            print (f"{'':=<55}")
-            print ("                 EXPERIMENT COMPARISON               ")
-            print (f"{'':=<55}")
-            print (f"{'':<15}{user_inp1[:20]}  {'':<5}| {'':<15}{user_inp2[:20]}")
-            print (f"-------Metrics---------------")
-            for key1, value1 in match1.model_metrics.items():
-                print(f"{key1:<15}: {value1:<20}| {match2.model_metrics.get(key1, 'N/A')}")
-            print(f"-------Parameters---------------")
-            for key1, value1 in match1.model_parameters.items():
-                print(f"{key1:<15}: {value1:<20}| {match2.model_parameters.get(key1, 'N/A')}")
-
-
     def view_best_model(self,in_metric):
         if not any(in_metric in exp.model_metrics for exp in self.experiments ):
-            print("No Metric Name found")
+            return None
         else:
             best_experiment = max(
             self.experiments,
             key=lambda exp: exp.model_metrics.get(in_metric, 0)
         )
-            print(f"Best model for {in_metric} is: {best_experiment.model_name}")
-            print(f"{in_metric} score: {best_experiment.model_metrics[in_metric]}")
-            print(best_experiment)
+            return best_experiment
 
     def save_to_file(self):
         path = "C:\\Users\\debli\\python_practice\\TargetData\\"
