@@ -33,6 +33,10 @@ learning project towards an MLOps Engineering career.
 - DELETE /experiments/{exp_id}
 
 ## How to Run
+## "Known Limitations":
+- File paths are currently hardcoded for local development
+- To be updated with configurable paths in next version
+
 
 ### CLI Version
 python menu.py
