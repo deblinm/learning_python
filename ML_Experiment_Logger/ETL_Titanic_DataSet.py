@@ -1,7 +1,7 @@
 import pandas as pd
 
 def run_pipeline():
-        df = pd.read_csv("/SourceData/Titanic-Dataset.csv")
+        df = pd.read_csv("C:\\Users\\debli\\python_practice\\SourceData\\Titanic-Dataset.csv")
 
         df2 = df.drop(columns=['PassengerId','Name','Cabin','Ticket'])
         df2['Age'] = df2['Age'].fillna(df2['Age'].median())
