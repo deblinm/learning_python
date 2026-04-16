@@ -1,0 +1,16 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v4.0.0
+
+      - name: Build Docker Image
+        uses: docker build -t my-mlops-img .
