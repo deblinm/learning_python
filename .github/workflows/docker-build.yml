@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Code Checkout
-        uses: actions/checkout@v4.0.0
+        uses: actions/checkout@v4
 
       - name: Build Docker Image
         run: docker build -t my-mlops-img .
