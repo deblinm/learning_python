@@ -13,4 +13,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker Image
-        run: docker build -t my-mlops-img .
+        run: docker build -t my-mlops-img ./ML_Experiment_Logger
