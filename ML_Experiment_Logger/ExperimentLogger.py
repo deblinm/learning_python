@@ -73,7 +73,7 @@ class ExperimentLogger:
             print(best_experiment)
 
     def save_to_file(self):
-        path = "\\Users\\trisha\\PythonPractice\\SourceFiles"
+        path = "\\Users\\deblin\\PycharmProjects\\SourceFiles"
         file_name = "ML_Experiment_Logger"
         experiment_dict = [asdict(exp) for exp in self.experiments]
         with open (f"{path}{file_name}.json",'w') as f:
@@ -81,7 +81,7 @@ class ExperimentLogger:
 
 
     def load_from_file(self):
-        path = "\\Users\\trisha\\PythonPractice\\TargetFiles\\"
+        path = "\\Users\\deblin\\PycharmProjects\\TargetFiles\\"
         file_name = "ML_Experiment_Logger"
         data_list = []
         with open(f"{path}{file_name}.json", 'r') as ip_file:
